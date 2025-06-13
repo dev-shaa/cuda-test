@@ -4,11 +4,11 @@
 
 #include "utils.cu"
 
-#define N 32
+#define N 1024
 
 int main(int argc, char const *argv[])
 {
-    int *host_values = (int *)malloc(N * sizeof(int));
+    int host_values[N];
     for (int i = 0; i < N; i++)
         host_values[i] = i;
 
@@ -44,7 +44,6 @@ int main(int argc, char const *argv[])
     printf("\n");
 
     free(streams);
-    free(host_values);
 
     return 0;
 }
