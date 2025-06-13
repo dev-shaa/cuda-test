@@ -2,12 +2,9 @@
 #include <stdlib.h>
 #include <cuda_runtime.h>
 
-#define N 32
+#include "utils.cu"
 
-__global__ void foo(int *values)
-{
-    values[threadIdx.x] += 1;
-}
+#define N 32
 
 int main(int argc, char const *argv[])
 {
@@ -16,6 +13,7 @@ int main(int argc, char const *argv[])
         host_values[i] = i;
 
     int *dev_values;
+    cudaFree(NULL);
     cudaMalloc(&dev_values, N * sizeof(int));
     cudaMemcpy(dev_values, host_values, N * sizeof(int), cudaMemcpyHostToDevice);
 
