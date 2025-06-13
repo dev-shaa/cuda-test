@@ -14,6 +14,8 @@ int main(int argc, char const *argv[])
 
     int gpu_count;
     cudaGetDeviceCount(&gpu_count);
+
+    int size = N / gpu_count;
     cudaStream_t *streams = (cudaStream_t *)malloc(gpu_count * sizeof(cudaStream_t));
 
     for (int i = 0; i < gpu_count; i++)
@@ -22,12 +24,12 @@ int main(int argc, char const *argv[])
         cudaStreamCreate(&(streams[i]));
 
         int *dev_values;
-        cudaMallocAsync(&dev_values, N * sizeof(int), streams[i]);
-        cudaMemcpyAsync(dev_values, host_values, N * sizeof(int), cudaMemcpyHostToDevice, streams[i]);
+        cudaMallocAsync(&dev_values, size * sizeof(int), streams[i]);
+        cudaMemcpyAsync(dev_values, host_values + size * i, size * sizeof(int), cudaMemcpyHostToDevice, streams[i]);
 
-        foo<<<1, N, 0, streams[i]>>>(dev_values);
+        foo<<<1, size, 0, streams[i]>>>(dev_values);
 
-        cudaMemcpyAsync(host_values, dev_values, N * sizeof(int), cudaMemcpyDeviceToHost, streams[i]);
+        cudaMemcpyAsync(host_values + size * i, dev_values, size * sizeof(int), cudaMemcpyDeviceToHost, streams[i]);
         cudaFreeAsync(dev_values, streams[i]);
     }
 
