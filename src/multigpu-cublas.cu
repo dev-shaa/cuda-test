@@ -5,8 +5,8 @@
 #include <assert.h>
 
 #define M 8
-#define K M
-#define N M
+#define K 5
+#define N 4
 
 void phpc_gemm_cublas(const double *a, int lda, const double *b, int ldb, double *c, int ldc, int m, int k, int n, int gpu_count)
 {
