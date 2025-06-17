@@ -12,6 +12,6 @@
 # MPI_INCLUDE_PATH="/usr/mpi/gcc/openmpi-4.1.0rc5/include"
 # MPI_LIB_PATH="/usr/mpi/gcc/openmpi-4.1.0rc5/lib64"
 
-nvcc ./src/multigpu-cublas.cu -o ./bin/cublas -lcublas && sun ./bin/cublas
+nvcc ./src/multigpu-cublas.cu -o ./bin/cublas -lcublas && srun ./bin/cublas
 
 wait
