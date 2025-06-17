@@ -35,6 +35,8 @@ int main(int argc, char const *argv[])
     int gpu_count;
     cudaGetDeviceCount(&gpu_count);
 
+    printf("GPUS: %d\n", gpu_count);
+
     double a[M * LDA];
     double b[K * LDB];
     double c[M * LDC];
