@@ -7,7 +7,7 @@
 __global__ void foo(float *values)
 {
     uint id = blockDim.x * blockIdx.x + threadIdx.x;
-    values[id] += 1;
+    values[id] = sin(values[id]);
 }
 
 int main(int argc, char const *argv[])

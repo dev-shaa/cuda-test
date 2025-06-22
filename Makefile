@@ -1,3 +1,3 @@
 main:
 	mkdir -p bin
-	nvcc ./src/main.cu -o ./bin/main -lm
+	nvcc ./src/main.cu -o ./bin/main -lm -lineinfo
