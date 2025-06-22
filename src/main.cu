@@ -6,13 +6,15 @@
 
 __global__ void foo(float *values)
 {
-    values[threadIdx.x] += 1;
+    uint id = blockDim.x * blockIdx.x + threadIdx.x;
+    values[id] += 1;
 }
 
 int main(int argc, char const *argv[])
 {
     assert(argc > 1);
     int count = atoi(argv[1]);
+    assert(count > 0 && count % 32 == 0);
 
     int gpu_count;
     cudaGetDeviceCount(&gpu_count);
@@ -34,7 +36,7 @@ int main(int argc, char const *argv[])
         cudaMallocAsync(&dev_values, count * sizeof(float), streams[i]);
         cudaMemcpyAsync(dev_values, host_values + i * count, count * sizeof(float), cudaMemcpyHostToDevice, streams[i]);
 
-        foo<<<1, count>>>(dev_values);
+        foo<<<count / 32, 32>>>(dev_values);
 
         cudaMemcpyAsync(host_values + i * count, dev_values, count * sizeof(float), cudaMemcpyDeviceToHost, streams[i]);
         cudaFreeAsync(dev_values, streams[i]);
