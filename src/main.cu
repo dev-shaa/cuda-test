@@ -4,27 +4,22 @@
 #include <assert.h>
 #include <math.h>
 
+#define N 32
+
 __global__ void foo(float *values)
 {
-    uint id = blockDim.x * blockIdx.x + threadIdx.x;
-    values[id] = sin(values[id]);
+    values[threadIdx.x] = threadIdx.x;
 }
 
 int main(int argc, char const *argv[])
 {
-    assert(argc > 1);
-    int count = atoi(argv[1]);
-    assert(count > 0 && count % 32 == 0);
-
     int gpu_count;
     cudaGetDeviceCount(&gpu_count);
     assert(gpu_count > 0);
 
-    int N = gpu_count * count;
+    int count = N * gpu_count;
     float *host_values;
-    cudaMallocHost(&host_values, N * sizeof(float));
-    for (int i = 0; i < N; i++)
-        host_values[i] = i;
+    cudaMallocHost(&host_values, count * sizeof(float));
 
     cudaStream_t streams[8];
     for (int i = 0; i < gpu_count; i++)
@@ -33,12 +28,12 @@ int main(int argc, char const *argv[])
 
         cudaSetDevice(i);
         cudaStreamCreate(&(streams[i]));
-        cudaMallocAsync(&dev_values, count * sizeof(float), streams[i]);
-        cudaMemcpyAsync(dev_values, host_values + i * count, count * sizeof(float), cudaMemcpyHostToDevice, streams[i]);
+        cudaMallocAsync(&dev_values, N * sizeof(float), streams[i]);
+        cudaMemcpyAsync(dev_values, host_values + i * N, N * sizeof(float), cudaMemcpyHostToDevice, streams[i]);
 
-        foo<<<count / 32, 32>>>(dev_values);
+        foo<<<1, N>>>(dev_values);
 
-        cudaMemcpyAsync(host_values + i * count, dev_values, count * sizeof(float), cudaMemcpyDeviceToHost, streams[i]);
+        cudaMemcpyAsync(host_values + i * N, dev_values, N * sizeof(float), cudaMemcpyDeviceToHost, streams[i]);
         cudaFreeAsync(dev_values, streams[i]);
     }
 
@@ -49,9 +44,8 @@ int main(int argc, char const *argv[])
         cudaStreamDestroy(streams[i]);
     }
 
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < count; i++)
         printf("%.f ", host_values[i]);
-
     printf("\n");
 
     cudaFreeHost(host_values);

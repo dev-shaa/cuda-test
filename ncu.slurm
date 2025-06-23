@@ -9,6 +9,6 @@
 #SBATCH --error=error.err
 #SBATCH --job-name=test
 
-srun ncu -o ncu-report ./bin/main $1
+srun ncu -o ncu-report ./bin/main
 
 wait

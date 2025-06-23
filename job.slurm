@@ -9,6 +9,6 @@
 #SBATCH --error=error.err
 #SBATCH --job-name=test
 
-srun nsys profile ./bin/main $1
+srun nsys profile ./bin/main
 
 wait
